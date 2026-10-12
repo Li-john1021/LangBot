@@ -10,6 +10,7 @@ import {
 } from './workspaceContext';
 import { setCurrentWorkspaceSnapshot } from './currentWorkspaceStore';
 import { clearWorkspaceBootstrapSnapshot } from './workspaceBootstrapStore';
+import i18n from 'i18next';
 
 type JSONValue = string | number | boolean | JSONObject | JSONArray | null;
 interface JSONObject {
@@ -79,6 +80,9 @@ export abstract class BaseHttpClient {
     // 请求拦截
     this.instance.interceptors.request.use(
       async (config) => {
+        // Account-only endpoints have no selected Workspace. Workspace routes
+        // resolve their persisted language and override this presentation hint.
+        config.headers['X-LangBot-Language'] = i18n.language || 'en-US';
         // 客户端添加认证头
         if (typeof window !== 'undefined' && !this.disableToken) {
           const session = this.getSessionSync();
